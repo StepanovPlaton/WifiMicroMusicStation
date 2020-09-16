@@ -46,8 +46,9 @@ class MicroPyServer(object):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self._host, self._port))
-        sock.listen(1)
+        sock.listen(3)
         while True:
+            print("ACTIVE")
             try:
                 self._connect, address = sock.accept()
                 request = self._get_request()

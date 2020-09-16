@@ -1,72 +1,62 @@
 import machine
 from time import sleep
 
-class MediaPlayerClass:
-    def __init__(self, Player, BusyPin, PlayedLedPin=16, FileLimit=200, FloderLimit=3, Play=True):
-        self.Playing = False
-        self.Volume = 15
-        self.PlayingFile = 1
-        self.PlayingFloder = 1
 
-        self.LoopFile = False
-        self.LoopDirectory = False
-        self.RandomFiles = False
-        self.RandomFloders = False
+class MediaPlayerClass:
+    def __init__(self, Player, BusyPin, FileLimit, FolderLimit=0, Play=False):
+        self.Playing = False
+        self.Volume = 10
+        
+        self.PlayingFile = 1
+        self.PlayingFolder = 1
 
         self.Player = Player
-        self.Play_led = machine.Pin(PlayedLedPin, machine.Pin.OUT)
         self.BusyPin = machine.Pin(BusyPin, machine.Pin.IN)
+        self.Noise = machine.ADC(0)
 
+        self.SetVolume(self.Volume)
+    
+        self.FileLimit = []
         self.FileLimit = FileLimit
-        self.FloderLimit = FloderLimit
+
+        self.FolderLimit = FolderLimit
 
         if(Play): self.Play()
+
     def Play(self): 
+        if(self.PlayingFile > self.FileLimit[self.PlayingFolder]): raise ValueError("Invalid file number!")
         if(not self.Playing):
             self.SetVolume(self.Volume)
-            self.Player.play(self.PlayingFloder, self.PlayingFile)
+            self.Player.play(self.PlayingFolder, self.PlayingFile)
             self.Playing = True
-            self.Play_led.on()
     def Stop(self): 
         if(self.Playing):
             self.SetVolume(0)
             self.Playing = False
-            self.Play_led.off()
 
-    def PlayFile(self, Floder=None, File=None):
-        self.SetVolume(self.Volume)
+    def PlayFile(self):
+        if(self.PlayingFile > self.FileLimit[self.PlayingFolder]): raise ValueError("Invalid file number!")
         self.Playing = True
-        self.Play_led.on()
-        self.Player.play(Floder if Floder else self.PlayingFloder, File if File else self.PlayingFile)
+        self.Player.play(self.PlayingFolder, self.PlayingFile)
 
     def Next(self):
         self.PlayingFile += 1
-        if(self.PlayingFile > self.FileLimit):
-            if(self.LoopDirectory): 
-                self.PlayingFile = 1
-            else: self.NextFloder()  
-        if(self.PlayingFile <= self.FileLimit or 
-           self.PlayingFile > self.FileLimit and self.LoopDirectory):
-            self.PlayFile()
+        if(self.PlayingFile > self.FileLimit[self.PlayingFolder]): self.NextFolder()  
+        if(self.PlayingFile <= self.FileLimit[self.PlayingFolder]): self.PlayFile()
     def Back(self):
         self.PlayingFile -= 1
-        if(self.PlayingFile < 1): 
-            if(self.LoopDirectory): self.PlayingFile = self.FileLimit
-            else: self.BackFloder(self.FileLimit)
-        if(self.PlayingFile >= 1 or self.PlayingFile < 1 and self.LoopDirectory):    
-            self.PlayFile()
+        if(self.PlayingFile < 1): self.BackFolder(self.FileLimit[self.PlayingFolder])
+        if(self.PlayingFile >= 1): self.PlayFile()
 
-    def NextFloder(self, file=1):
-        self.PlayingFloder += 1
+    def NextFolder(self, file=1):
+        self.PlayingFolder += 1
         self.PlayingFile = file
-        if(self.PlayingFloder > self.FloderLimit):
-            self.PlayingFloder = 1
+        if(self.PlayingFolder > self.FolderLimit): self.PlayingFolder = 1
         self.PlayFile()
-    def BackFloder(self, file=1):
-        self.PlayingFloder -= 1
+    def BackFolder(self, file=1):
+        self.PlayingFolder -= 1
         self.PlayingFile = file
-        if(self.PlayingFloder < 1):
-            self.PlayingFloder = self.FloderLimit
+        if(self.PlayingFolder < 1): self.PlayingFolder = self.FolderLimit
         self.PlayFile()
 
     def Louder(self):
@@ -76,5 +66,7 @@ class MediaPlayerClass:
         self.Volume-=1
         self.SetVolume(self.Volume)
     def SetVolume(self, volume):
+        self.Volume = volume
         self.Player.volume(self.Volume/30)
-        sleep(0.1)
+        sleep(0.5)
+

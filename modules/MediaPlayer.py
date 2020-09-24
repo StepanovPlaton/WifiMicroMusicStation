@@ -3,7 +3,7 @@ from time import sleep
 
 
 class MediaPlayerClass:
-    def __init__(self, Player, BusyPin, FileLimit, FolderLimit=0, Play=False):
+    def __init__(self, Player, BusyPin, FileLimit, FolderLimit=0):
         self.Playing = False
         self.Volume = 10
         
@@ -21,10 +21,8 @@ class MediaPlayerClass:
 
         self.FolderLimit = FolderLimit
 
-        if(Play): self.Play()
-
     def Play(self): 
-        if(self.PlayingFile > self.FileLimit[self.PlayingFolder]): raise ValueError("Invalid file number!")
+        if(self.PlayingFile > self.FileLimit[self.PlayingFolder-1]): raise ValueError("Invalid file number!")
         if(not self.Playing):
             self.SetVolume(self.Volume)
             self.Player.play(self.PlayingFolder, self.PlayingFile)
@@ -35,17 +33,17 @@ class MediaPlayerClass:
             self.Playing = False
 
     def PlayFile(self):
-        if(self.PlayingFile > self.FileLimit[self.PlayingFolder]): raise ValueError("Invalid file number!")
+        if(self.PlayingFile > self.FileLimit[self.PlayingFolder-1]): raise ValueError("Invalid file number!")
         self.Playing = True
         self.Player.play(self.PlayingFolder, self.PlayingFile)
 
     def Next(self):
         self.PlayingFile += 1
-        if(self.PlayingFile > self.FileLimit[self.PlayingFolder]): self.NextFolder()  
-        if(self.PlayingFile <= self.FileLimit[self.PlayingFolder]): self.PlayFile()
+        if(self.PlayingFile > self.FileLimit[self.PlayingFolder-1]): self.NextFolder()  
+        if(self.PlayingFile <= self.FileLimit[self.PlayingFolder-1]): self.PlayFile()
     def Back(self):
         self.PlayingFile -= 1
-        if(self.PlayingFile < 1): self.BackFolder(self.FileLimit[self.PlayingFolder])
+        if(self.PlayingFile < 1): self.BackFolder(self.FileLimit[self.PlayingFolder-1])
         if(self.PlayingFile >= 1): self.PlayFile()
 
     def NextFolder(self, file=1):
@@ -68,5 +66,5 @@ class MediaPlayerClass:
     def SetVolume(self, volume):
         self.Volume = volume
         self.Player.volume(self.Volume/30)
-        sleep(0.5)
+        sleep(0.1)
 

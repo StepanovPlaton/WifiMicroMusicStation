@@ -21,3 +21,6 @@ wifi.active(True)
 wifi.ifconfig((Config.WLAN_static_ip, Config.WLAN_netmask, Config.WLAN_gateway, Config.WLAN_DNS_server))
 if not wifi.isconnected():
     wifi.connect(Config.WLAN_id, Config.WLAN_password)
+
+print(wifi.isconnected())
+print(wifi.ifconfig(), Config.WLAN_id, Config.WLAN_password)

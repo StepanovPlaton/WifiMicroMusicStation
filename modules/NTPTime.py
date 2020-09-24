@@ -1,7 +1,14 @@
 import ntptime, time
 
 class NTPTimeClass:
-    def __init__(self): self.Sync()
-    def Sync(self): ntptime.settime()
+    def __init__(self): 
+        self.TimeOk = False
+        self.Sync()
+    def Sync(self): 
+        try: 
+            ntptime.settime()
+            self.TimeOk = True
+        except Exception: self.TimeOk = False
     def GetNTPTime(self):
-        return list(time.localtime())
+        if(self.TimeOk): return list(time.localtime())
+        else: return None

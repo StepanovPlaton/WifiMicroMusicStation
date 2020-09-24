@@ -1,0 +1,1 @@
+python .\webrepl_cli.py ../configs/config.txt 192.168.32.240:/configs/config.txt - заливаем конфиг

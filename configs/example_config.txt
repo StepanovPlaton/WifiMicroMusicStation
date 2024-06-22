@@ -22,10 +22,21 @@
 #	6) С 21-00 до 00-00 = Поздний вечер
 #   7) Отсутствие Wifi сигнала для синхронизации времени
 
+# !Правила подключения NodeMCU и DFPlayerMini!
+# NodeMCU	DFPlayerMini
+#	D2 			Busy
+#	D4			 RX
+#	A0			DAC_L
+# VIN(5V)		VCC
+#	GND			GNDx2
+#
+#				SPK#1 | Выходы
+#				SPK#2 |	  на динамик
+
 # Название Wifi сети, к которой следует подключатся
-WLAN_id = home
+WLAN_id = network
 # Пароль от Wifi, к которой следует подключатся
-WLAN_password = DWLSeaNet302WPA
+WLAN_password = password
 # Установить следующий статический ip адрес 
 WLAN_static_ip = 192.168.32.240
 # Маска сети
